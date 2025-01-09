@@ -7,7 +7,7 @@
 
 한 객체가 여러가지 타입을 가질 수 있는 것
 
-![다형성과 상속](/images/polymorphism_diagram.png)
+![다형성과 상속](/images/dayoung/polymorphism_diagram.png)
 
 위 그림 기준으로 Seller는 Person, Agent 타입 두 가지 모두 될 수 있으며, Java 기준으로 다형성은 두 가지 방법으로 구현할 수 있다.
 + 인터페이스 상속
