@@ -10,6 +10,84 @@
 ---
 ### **싱글톤(Singleton) 패턴**
 
+어플리케이션 내에서 **단 하나의 유일한 객체**를 만들기 위한 패턴이다. 새로운 인스턴스를 만들지 않고 기존의 인스턴스를 활용함으로써 메모리 절약을 한다. 
+
+**싱글톤 패턴 적용해야 할 때**
++ 특정 객체가 리소스를 많이 차지 할 때
++ 하나의 객체로도 충분히 사용이 가능할 때
+
+**싱글톤 패턴 예시**
++ DBCP, Thread Pool, 캐시, 로그 라이브러리
+
+**싱글톤 패턴 구조**
+```java
+public class SingletonA {
+    private static SingletonA instance;
+
+    private SingletonA() {}
+    public static SingletonA getInstance(){
+        if(instance == null) {
+            instance = new SingletonA();
+        }
+        return instance;
+    }
+}
+```
+
+**싱글톤 패턴 구현 기법(Java)**
++ Eager Initialization
+  + `static final` 로 싱글톤 객체 할당하여 인스턴스 구현
+  + 멀티 쓰레드 환경에서도 안전
+  + static 멤버라 자원 낭비가 발생할 수 있음
+  + 예외처리 불가
++ Lazy initialization
+  + `static` 객체로만 멤버를 선언 후, `getInstance` 호출 시 인스턴스가 Null 이면 할당 후 사용하도록 구현
+  + 사용 시점에 할당하기 때문에 자원낭비 문제 극복
+  + 멀티 쓰레드 환경에서 동시성 문제 발생
++ Thread safe initialization
+  + `synchronized` 키워드를 통해 멀티 쓰레드 환경에서 싱글톤 메서드에 접근할 때 제어하는 방식
+  + 매번 객체를 가져올 때마다 `synchronized`를 호출하여 성능 하락 문제 발생
++ Double-Checked Locking
+  + 최초 초기화 시에만 `synchronized` 를 사용하는 기법
+  + 멀티 쓰레드 환경에서 변수를 캐시가 아닌 메인 메모리에서 가져오도록 `volatile` 키워드를 사용해야 함
+  + JVM 1.5 이상이어야 하며, JVM에 대한 이해도가 필요하여 사용을 지양함
++ **Bill Pugh Solution(Lazy Holder)**
+  ```java
+  class Singleton {
+
+    private Singleton() {}
+
+    // static 내부 클래스를 이용
+    // Holder로 만들어, 클래스가 메모리에 로드되지 않고 getInstance 메서드가 호출되어야 로드됨
+    private static class SingleInstanceHolder {
+        private static final Singleton INSTANCE = new Singleton();
+    }
+
+    public static Singleton getInstance() {
+        return SingleInstanceHolder.INSTANCE;
+    }
+  }
+  ```
+  + 클래스 안에 내부 클래스(holder)를 두어 클래스가 로드되는 시점을 이용한 방식
+  + 클라이언트가 임의로 싱글톤을 파괴할 수 있음 (Reflection API, 직렬화/역직렬화)
+  + 성능이 중요할 시, Enum 방식보다 유리
+  + Inpa Dev 내용 참고
+    + [클래스는 언제 메모리에 로딩 & 초기화 되는가](https://inpa.tistory.com/entry/JAVA-%E2%98%95-%ED%81%B4%EB%9E%98%EC%8A%A4%EB%8A%94-%EC%96%B8%EC%A0%9C-%EB%A9%94%EB%AA%A8%EB%A6%AC%EC%97%90-%EB%A1%9C%EB%94%A9-%EC%B4%88%EA%B8%B0%ED%99%94-%EB%90%98%EB%8A%94%EA%B0%80-%E2%9D%93)
+    + [내부 클래스는 static 으로 선언 안하면 큰일 난다](https://inpa.tistory.com/entry/JAVA-%E2%98%95-%EC%9E%90%EB%B0%94%EC%9D%98-%EB%82%B4%EB%B6%80-%ED%81%B4%EB%9E%98%EC%8A%A4%EB%8A%94-static-%EC%9C%BC%EB%A1%9C-%EC%84%A0%EC%96%B8%ED%95%98%EC%9E%90)
++ **Enum 이용**
+  + Java 자체에서 Enum은 멤버가 private으로 만들고 한 번만 초기화되어 멀티 쓰레드 환경에서도 안전
+  + 변수, 메서드 선언도 가능하여 클래스 처럼 사용 가능
+  + 클라이언트에서 Reflection를 통한 공격에도 안전
+  + enum 외의 클래스 상속 불가, 싱글톤을 일반적인 클래스로 변경해야 한다면 변경 영향도가 큼
+  + 직렬화, 안정성이 중요할 시, LazeHolder 보다 유리
+
+<br>
+
+**싱글톤 패턴 단점**
++ 모듈간 의존성이 높아짐
++ SOLID 원칙에 위배되는 사례가 많음
++ 하나의 객체를 공유하기 때문에 TDD 시, 독립적인 환경을 유지하기 위해 매번 인스턴스를 초기화해야 함
+
 <br>
 
 ---
