@@ -69,3 +69,67 @@
 
 ---
 ### **복합체(컴포지트: Composite) 패턴**
+
+**전체-부분 관계를 갖는 객체들을 동일 인터페이스로 구현하여, 클라이언트에서 동일한 컴포넌트로 취급**하게 하는 패턴이다. 리눅스의 파일구조시스템에서 폴더와 파일은 다른 객체지만, 모두 `File`로 취급되는 것과 비슷하다고 보면 된다.
+
+**복합체 패턴 구조**
+![복팝체 패턴 구조](/images/dayoung/composite-pattern-structure.png)
+
++ Component - Leaf와 Composite의 공통 상위 인터페이스
++ Composite
+  + Component 구현체들을 내부 리스트로 관리
+  + `operation()` 호출 시, 내부의 Component들에게 실행 위임
++ Leaf - 단일 객체로 단순한 내용물 표시
+
+```java
+interface Component{
+    void operation();
+}
+```
+```java
+class Leaf implements Component {
+    @Override
+    public void operation() {
+        System.out.println(this + "호출");
+    }
+}
+```
+```java
+class Composite implements Component {
+    private List<Component> componentList = new ArrayList();
+
+    @Override
+    public void operation() {
+        System.out.println(this + "호출");
+
+        for(Component component : componentList) {
+            component.operation();
+        }
+    }
+
+    public void add(Component component) {
+        componentList.add(component);
+    }
+
+    public void remove(Component component) {
+        if(componentList.contains(component)) {
+            componentList.remove(component);
+        }
+    }
+
+    public List<Component> getChild() {
+        return componentList;
+    }
+}
+```
+
+**복합체 패턴 장점**
++ 다형성 재귀를 통해 트리 구조를 편리하게 구성 가능
++ 수평적, 수직적 모든 방향으로 객체 확장 가능
++ 새로운 Leaf 클래스가 추가될 때, 단일 객체만 확장 가능하여 개방-폐쇄 원칙 준수
+
+**복합체 패턴 단점**
++ 트리의 깊이(depth)가 늘어날수록 디버깅 어려움(재귀호출)
++ 복합 객체와 단일 객체를 동일 인터페이스로 처리해야 하기 때문에, 복합객체에서 구성요소에 제약을 걸기 어려움
+  + 복합 객체가 가질 수 있는 단일 객체를 제한해야 할 때
+  + 수평적으로만 확장을 제한해야 할 때
