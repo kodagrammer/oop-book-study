@@ -28,3 +28,95 @@
 ---
 
 ### **Null 객체 패턴**
+
+**NullPointerException 방지를 위해 사용하는 패턴**이다. 특정 객체가 null인지 판단 후 로직을 수행해야 하는 경우, 클라이언트 쪽에서 null 체크를 하지 않아 발생하는 NullPointerException을 방지할 수 있다.
+
+**패턴 미적용 시 예제**
+```java
+class Ticket {
+  private String ticketNumber;
+  private LocalDate ticketingDate;
+  private LocalDate useDate;
+  private LocalDate effectiveDate;
+
+  public boolean expired() {...}
+  public void refund(){ ... }
+  public void use(){ ... }
+}
+```
+
+```java
+class Passenger {
+  private Ticket ticketInfo;
+
+  public 
+
+  public void refund() {
+    if(this.ticketInfo != null && !ticketInfo.expired()) {
+      ticketInfo.refund();
+    }
+  }
+
+  public void useTicket() {
+    // null 체크 중복
+    if(this.ticketInfo != null && !ticketInfo.expired()) {
+      ticketInfo.use();
+    }
+  }
+}
+```
+
+**패턴 적용 시 예제**
+```java
+interface Ticket {
+  void refund();
+  void use();
+}
+
+class issuedTicket implements Ticket {
+  private String ticketNumber;
+  private LocalDate ticketingDate;
+  private LocalDate useDate;
+  private LocalDate effectiveDate;
+  
+  private boolean expired() {...}
+  @Override
+  boolean refund() {
+    if(!expired()){ ... }
+  }
+  @Override
+  void use() {
+    if(!expired()){ ... }
+  }
+}
+
+// Null 객체 생성
+class NullTicket implements Ticket {
+  @Override
+  boolean refund() {
+  }
+  @Override
+  void use() {
+  }
+}
+```
+
+```java
+class Passenger {
+  private Ticket ticketInfo;
+
+  public 
+
+  public void refund() {
+    ticketInfo.refund();
+  }
+
+  public void useTicket() {
+    ticketInfo.refund();
+  }
+}
+```
+
+**주의점**
++ Null 객체 패턴을 남용하면 예외나 에러를 탐지하기 어려움
++ 관리할 클래스와 코드가 과도하게 증가할 수 있음
